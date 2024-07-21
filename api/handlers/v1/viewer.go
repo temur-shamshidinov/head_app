@@ -112,5 +112,13 @@ func ( h *handlers) SignUp (ctx *gin.Context) {
 
 	var otpData models.OtpData
 
-	json.Unmarshal([]byte(otpStrData), &otpData)
+	err = json.Unmarshal([]byte(otpStrData), &otpData)
+	if err != nil {
+		return
+	}
+
+	if otpData.Otp != regReqBody.Otp {
+		ctx.JSON(405,"otp is incorrect")
+		return
+	}
 }
