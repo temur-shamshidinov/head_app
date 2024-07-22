@@ -26,12 +26,25 @@ func Api(opt Options) *gin.Engine {
 	api.GET("/ping",h.Ping)
 
 	own := api.Group("/own")
-	{
-		own.POST("/log-in")
-		own.POST("/log-out")
+	{ 
+		// SignUp
+	
+		own.POST("/sign-out",h.OwnSignOut)
+
+		// Category
 		own.POST("/category", h.CreateCategory)
-		own.PUT("/category/:id")
-		own.DELETE("/category/:id")
+		own.PUT("/category/:id",h.UpdateCategory)
+		own.DELETE("/category/:id",h.DeleteCategory)
+
+		//	SubCategory
+		own.POST("/sub-category",h.CreateSubCategory)
+		own.PUT("/sub-category/:id",h.UpdateSubCategory)
+		own.DELETE("/sub-category/:id",h.DeleteSubCategory)
+
+		// Article
+		own.POST("/article",h.CreateSubCategory)
+		own.PUT("/article/:id",h.UpdateSubCategory)
+		own.DELETE("/article/:id",h.DeleteSubCategory)
 	}
 
 	vw := api.Group("/vw")
@@ -42,16 +55,17 @@ func Api(opt Options) *gin.Engine {
 
 	pb := api.Group("/pb")
 	{
-		pb.POST("/check-user",h.CheckUser)
-		pb.POST("/check-otp/:id",h.CheckUser)
-		pb.POST("/sign-up")
-		pb.POST("/log-in")
-		pb.GET("/categories",h.GetCategoriesList)
-		pb.GET("/categories/:id",h.GetCategory)
-		pb.GET("/sub-categories")
-		pb.GET("/sub-categories/:id")
-		pb.GET("/articles")
-		pb.GET("/articles/:id")
+		own.POST("/own/sing-in",h.OwnSignIn)  // in-proccess 
+		pb.POST("/check-user",h.CheckUser)  // completed
+		pb.POST("/check-otp/:id",h.GetCategory) // completed
+		pb.POST("/sign-up",h.SignUp)            // completed
+		pb.POST("/sign-in",h.SignIn)				// completed
+		pb.GET("/categories",h.GetCategoriesList) // completed
+		pb.GET("/categories/:id",h.GetCategory)   // completed
+		pb.GET("/sub-categories",h.GetSubCategoriesList)
+		pb.GET("/sub-categories/:id",h.GetSubCategory)
+		pb.GET("/articles",h.GetArticleList)
+		pb.GET("/articles/:id",h.GetArticle)
 	}
 
 	return engine

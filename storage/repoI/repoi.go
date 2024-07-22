@@ -37,6 +37,10 @@ type OwnerRepoI interface{
 }
 
 type CommonRepoI interface {
-	CheckIsExists(ctx context.Context, req models.Common) (bool, error)
+	CheckIsExists(ctx context.Context, req *models.Common) (bool, error)
 }
 
+type ViewerRepoI interface {
+	CreateViewer(ctx context.Context,viewer *models.Viewer) (*models.Claim, error) 
+	LogIn(ctx context.Context,login *models.LogInViewer) (*models.Claim, error) 
+}

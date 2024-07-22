@@ -30,7 +30,7 @@ func (r *redisRepo) Exists(ctx context.Context, key string) (bool, error) {
 
 	isExists, err := r.cli.Do(ctx, "EXISTS", key).Result()
 
-	defer r.cli.Close()
+	// defer r.cli.Close()
 	if err != nil {
 		r.log.Error("error on checking exists", logger.Error(err))
 		return false, nil
@@ -44,7 +44,7 @@ func (r *redisRepo) Exists(ctx context.Context, key string) (bool, error) {
 func (r *redisRepo) Set(ctx context.Context, key, value string, exp int) error {
 
 	_, err := r.cli.SetEX(ctx, key, value, time.Second*time.Duration(exp)).Result()
-	defer r.cli.Close()
+
 	if err != nil {
 		r.log.Error("error on setting to cache", logger.Error(err))
 		return err
@@ -66,7 +66,7 @@ func (r *redisRepo) GetDel(ctx context.Context, key string) (string, error) {
 		return "", err
 	}
 
-	defer r.cli.Close()
+	// defer r.cli.Close()
 	return anyData, nil
 }
 

@@ -13,7 +13,7 @@ import (
 	"github.com/saidamir98/udevs_pkg/logger"
 )
 
-	var ctx = context.Background()
+var ctx = context.Background()
 
 func main() {
 
@@ -39,17 +39,38 @@ func main() {
 
 	log.Debug("successfully connected with redis")
 
-	cache := redis.NewRedisRepo(redisCli,log)
+	cache := redis.NewRedisRepo(redisCli, log)
 
 	storage := storage.NewStorage(pgxdb, log)
 
 	engine := api.Api(api.Options{
 		Storage: storage,
 		Log:     log,
-		Cache: cache,
+		Cache:   cache,
 	})
 
 	log.Debug("server is running on", logger.String("port", cfg.GeneralConfig.HTTPPort))
-	
+
 	engine.Run(cfg.GeneralConfig.HTTPPort)
 }
+
+// func main () {
+
+// 	tokens, err := token.GenerateJWT(models.Claim{UserID: "1001",UserRole: "beyafandi"})
+
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	fmt.Println(tokens)
+
+// 	time.Sleep(6 * time.Second)
+
+// 	claims, err := token.ParseJWT(tokens)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return
+// 	}
+
+// 	fmt.Println(claims)
+// }

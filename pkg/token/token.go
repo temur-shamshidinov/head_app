@@ -1,55 +1,55 @@
 package token
 
 import (
-	log "head_app/pkg/logger"
+	"head_app/models"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/saidamir98/udevs_pkg/logger"
 )
 
-type JWTHandler struct {
-	Sub       string
-	Exp       string
-	Iat       string
-	Aud       []string
-	Role      string
-	SignedKey string
-	Log       log.Log
-	Token     string
-	Timeout   int
+type Claim struct {
+	UserID   string
+	UserRole string
+	jwt.StandardClaims
 }
 
-type CustomClaims struct {
-	*jwt.Token
-	Sub  string   `json:"sub"`
-	Exp  string   `json:"exp"`
-	Iat  string   `json:"iat"`
-	Aud  []string `json:"aud"`
-	Role string   `json:"role"`
-}
+var secretJWTKey = []byte("secret_key")
 
-func (j *JWTHandler) GenerateToken() (string, error) {
-	var (
-		token  *jwt.Token
-		claims jwt.MapClaims
-	)
+func GenerateJWT(claim models.Claim) (string, error) {
 
-	token = jwt.New(jwt.SigningMethodHS256)
+	expTime := time.Now().Add(5 * time.Hour)
 
-	claims = token.Claims.(jwt.MapClaims)
-	claims["sub"] = j.Sub
-	claims["exp"] = time.Now().Add(time.Minute * time.Duration(j.Timeout)).Unix()
-	claims["iat"] = time.Now().Unix()
-	claims["aud"] = j.Aud  
-	claims["role"] = j.Role
-
-	accessToken, err := token.SignedString([]byte(j.SignedKey))
-	if err != nil {
-		j.Log.Error("error on genereting token", logger.Error(err))
-		return "", err
+	jwtClaim := Claim{
+		UserID:         claim.UserID,
+		UserRole:       claim.UserRole,
+		StandardClaims: jwt.StandardClaims{ExpiresAt: expTime.Unix()},
 	}
 
-	return accessToken, nil
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaim)
 
+	tokenString, err := token.SignedString(secretJWTKey)
+	if err != nil {
+		return "", nil
+	}
+
+	return tokenString, nil
+}
+
+func ParseJWT(tokenString string) (*Claim, error) {
+
+	var claim = &Claim{}
+
+	token, err := jwt.ParseWithClaims(tokenString, claim, func(t *jwt.Token) (interface{}, error) {
+		return secretJWTKey, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !token.Valid {
+		return nil, err
+	}
+
+	return claim, nil
 }

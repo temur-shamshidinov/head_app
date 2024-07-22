@@ -21,3 +21,12 @@ type ViewerRegReq struct {
 type CheckViewer struct {
 	Gmail string `json:"gmail"`
 }
+
+type LogInViewer struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type RespAuth struct {
+	AccessToken string `json:"access_token"`
+}

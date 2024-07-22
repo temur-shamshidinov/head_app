@@ -11,16 +11,16 @@ import (
 	"github.com/saidamir98/udevs_pkg/logger"
 )
 
-type CommonRepo struct {
+type commonRepo struct {
 	db  *pgx.Conn
 	log log.Log
 }
 
 func NewCommonRepo(db *pgx.Conn, log log.Log) repoi.CommonRepoI {
-	return &CommonRepo{db, log}
+	return &commonRepo{db, log}
 }
 
-func (c *CommonRepo) CheckIsExists(ctx context.Context, req models.Common) (bool, error) {
+func (c *commonRepo) CheckIsExists(ctx context.Context, req *models.Common) (bool, error) {
 
 	var isExists bool
 	query := fmt.Sprintf("SELECT EXISTS (SELECT 1 FROM %s WHERE %s = '%s')", req.TableName, req.ColumnName, req.ExpValue)

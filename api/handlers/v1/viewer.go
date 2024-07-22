@@ -3,9 +3,12 @@ package v1
 import (
 	"encoding/json"
 	"head_app/models"
+	"head_app/pkg/helpers"
 	"head_app/pkg/mail"
+	"head_app/pkg/token"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/saidamir98/udevs_pkg/logger"
 )
 
@@ -14,7 +17,7 @@ func (h *handlers) CheckUser(ctx *gin.Context) {
 
 	ctx.Bind(&reqBody)
 
-	isExists, err := h.storage.GetCommonRepo().CheckIsExists(ctx, models.Common{
+	isExists, err := h.storage.GetCommonRepo().CheckIsExists(ctx, &models.Common{
 		TableName:  "viewers",
 		ColumnName: "gmail",
 		ExpValue:   reqBody.Gmail,
@@ -87,21 +90,21 @@ func (h *handlers) CheckOTP(ctx *gin.Context) {
 
 	json.Unmarshal([]byte(data), &cacheData)
 
-	ctx.JSON(201,models.CheckOTPResp{
+	ctx.JSON(201, models.CheckOTPResp{
 		IsRight: cacheData.Otp == reqBody.Otp,
 	})
 
 }
 
-func ( h *handlers) SignUp (ctx *gin.Context) {
+func (h *handlers) SignUp(ctx *gin.Context) {
 	var regReqBody models.ViewerRegReq
-	
+
 	err := ctx.Bind(&regReqBody)
 	if err != nil {
 		return
 	}
 
-	otpStrData, err := h.cache.GetDel(ctx,regReqBody.Gmail)
+	otpStrData, err := h.cache.GetDel(ctx, regReqBody.Gmail)
 	if err != nil {
 		return
 	}
@@ -118,7 +121,64 @@ func ( h *handlers) SignUp (ctx *gin.Context) {
 	}
 
 	if otpData.Otp != regReqBody.Otp {
-		ctx.JSON(405,"otp is incorrect")
+		ctx.JSON(405, "otp is incorrect")
 		return
 	}
+
+	var viewer  = &models.Viewer{}
+
+	err = helpers.DataParser(regReqBody, &viewer)
+	if err != nil {
+		return
+	}
+
+	viewer.ViewerID = uuid.New()
+	viewer.Password, err = helpers.HashPassword(viewer.Password)
+	if err != nil {
+		return
+	}
+
+	claim, err := h.storage.GetViewerRepo().CreateViewer(ctx,viewer)
+	if err != nil {
+		ctx.JSON(500, err)
+		return
+	}
+
+	accesstoken,err := token.GenerateJWT(*claim)
+	if err != nil {
+		ctx.JSON(201,"registired")
+		return
+	}
+
+	ctx.JSON(201, &models.RespAuth{AccessToken: accesstoken})
 }
+
+
+func (h *handlers) SignIn (ctx *gin.Context) {
+
+	var reqBody *models.LogInViewer
+
+	err := ctx.ShouldBindJSON(&reqBody)
+	if err != nil {
+		return
+	}
+
+	claim, err := h.storage.GetViewerRepo().LogIn(ctx,reqBody)
+	if err != nil {
+		if err.Error() == "password in incorrect" {
+			ctx.JSON(405,err)
+			return
+		}
+		ctx.JSON(500,err)
+		return
+	}
+
+	accesstoken, err := token.GenerateJWT(*claim)
+	if err != nil {
+		return
+	}
+
+	ctx.JSON(201,&models.RespAuth{AccessToken: accesstoken})
+
+}
+

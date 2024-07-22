@@ -12,12 +12,14 @@ type StorageI interface {
 	GetContentRepo() repoi.ContentRepoI
 	GetOwnerRepo() repoi.OwnerRepoI
 	GetCommonRepo() repoi.CommonRepoI
+	GetViewerRepo()  repoi.ViewerRepoI
 }
 
 type storage struct {
 	contentRepo repoi.ContentRepoI
 	ownerRepo   repoi.OwnerRepoI
 	commonRepo  repoi.CommonRepoI
+	viewerRepo repoi.ViewerRepoI
 }
 
 func NewStorage(db *pgx.Conn, log log.Log) StorageI {
@@ -25,6 +27,7 @@ func NewStorage(db *pgx.Conn, log log.Log) StorageI {
 		contentRepo: postgres.NewContentRepo(db, log),
 		ownerRepo:   postgres.NewOwnerRepo(db, log),
 		commonRepo:  postgres.NewCommonRepo(db,log),
+		viewerRepo: postgres.NewViewerRepo(db,log),
 
 	}
 }
@@ -39,4 +42,8 @@ func (s *storage) GetOwnerRepo() repoi.OwnerRepoI {
 
 func (s *storage) GetCommonRepo() repoi.CommonRepoI{
 	return s.commonRepo
+}
+
+func (s *storage) GetViewerRepo() repoi.ViewerRepoI {
+	return s.viewerRepo
 }
