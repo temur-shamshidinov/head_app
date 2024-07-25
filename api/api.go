@@ -42,7 +42,7 @@ func Api(opt Options) *gin.Engine {
 		own.DELETE("/sub-category/:id",h.DeleteSubCategory)
 
 		// Article
-		own.POST("/article",h.CreateSubCategory)
+		own.POST("/article",h.CreateArticle)
 		own.PUT("/article/:id",h.UpdateSubCategory)
 		own.DELETE("/article/:id",h.DeleteSubCategory)
 	}

@@ -21,9 +21,4 @@ type GetCategoriesListResp struct {
 	Count      int32
 }
 
-type SubCategory struct {
-	SubCategoryID uuid.UUID `json:"sub_category_id"`
-	Name          string    `json:"name"`
-	CreatedAt     time.Time `json:"created_at"`
-	CategoryID    uuid.UUID `json:"category_id"`
-}
+

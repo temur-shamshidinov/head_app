@@ -5,7 +5,7 @@ import (
 	"head_app/models"
 )
 
-type ContentRepoI interface {
+type CategoryRepoI interface {
 	// Category
 	CreateCategory(ctx context.Context, category *models.Category) (*models.Category, error)
 	GetCategories(ctx context.Context, page, limit int32) (*models.GetCategoriesListResp, error)
@@ -13,17 +13,18 @@ type ContentRepoI interface {
 	UpdateCategory(ctx context.Context, category *models.Category) (*models.Category, error)
 	DeleteCategory(ctx context.Context, id string) error
 
-	// SubCategory
-	CreateSubCategory(ctx context.Context, category *models.SubCategory) (*models.SubCategory, error)
-	GetSubCategories(ctx context.Context, page, limit int32) ([]*models.SubCategory, error)
+}
+type SubCategoryRepoI interface {
+	CreateSubCategory(ctx context.Context, subcategory *models.SubCategory) (*models.SubCategory, error)
+	GetSubCategories(ctx context.Context, page, limit int32) (*models.GetSubCategoriesLisResp, error)
 	GetSubCategory(ctx context.Context, id string) (*models.SubCategory, error)
-	UpdateSubCategory(ctx context.Context, category *models.SubCategory) (*models.SubCategory, error)
+	UpdateSubCategory(ctx context.Context, subcategory *models.SubCategory) (*models.SubCategory, error)
 	DeleteSubCategory(ctx context.Context, id string) error
-
-	// Article
+}
+type  ArticleRepoI interface {
 
 	CreateArticle(ctx context.Context, article *models.Article) (*models.Article, error)
-	GetArticles(ctx context.Context, page, limit int32) ([]*models.Article, error)
+	GetArticles(ctx context.Context, page, limit int32) (*models.GetArticleListResp, error)
 	GetArticle(ctx context.Context, id string) (*models.Article, error)
 	UpdateArticle(ctx context.Context, article *models.Article) (*models.Article, error)
 	DeleteArticle(ctx context.Context, id string) error
