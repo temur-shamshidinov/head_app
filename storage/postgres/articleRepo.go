@@ -71,12 +71,11 @@ func (a *articleRepo) GetArticles(ctx context.Context, page, limit int32) (*mode
  			 sub_category_id
 		FROM 
 			articles 
-		LIMIT 
-			$1
-		OFFSET
-			$2
 		WHERE 
 			deleted_at IS  NULL
+		LIMIT  $1
+		OFFSET $2
+	
 	`
 	offset := (page - 1) * limit
 	rows, err := a.db.Query(ctx, query, limit, offset)
@@ -129,14 +128,20 @@ func (a *articleRepo) GetArticle(ctx context.Context, id string) (*models.Articl
 	var article models.Article
 
 	query := `SELECT
-				 * 
+				article_id,
+				title,
+				content,
+				created_at,
+				updated_at,
+				category_id,
+				sub_category_id
 			  FROM 
 			  	articles 
 			  WHERE 
 			  	article_id = $1 `
 
 	err := a.db.QueryRow(ctx, query, id).Scan(
-		&article.CategoryID,
+		&article.ArticleID,
 		&article.Title,
 		&article.Content,
 		&article.CreatedAt,

@@ -90,7 +90,7 @@ func (s *subcategoryRepo) GetSubCategories(ctx context.Context, page, limit int3
 
 	var count int
 
-	err = s.db.QueryRow(ctx, "SELECT count(*) FROM sub_categories ").Scan(&count)
+	err = s.db.QueryRow(ctx, "SELECT count(*) FROM sub_categories").Scan(&count)
 	if err != nil {
 		s.log.Error("error on scaning  SubCategory count ", logger.Error(err))
 		return nil, err
@@ -102,12 +102,15 @@ func (s *subcategoryRepo) GetSubCategories(ctx context.Context, page, limit int3
 	}, nil
 }
 func (s *subcategoryRepo) GetSubCategory(ctx context.Context, id string) (*models.SubCategory, error) {
+	
 	s.log.Debug("request in GetSubCategory.")
 
 	var subcategory models.SubCategory
 
 	query := `SELECT
-				 * 
+				sub_category_id,
+				name,           
+				category_id   
 			  FROM 
 			  	sub_categories 
 			  WHERE 
@@ -116,7 +119,7 @@ func (s *subcategoryRepo) GetSubCategory(ctx context.Context, id string) (*model
 	err := s.db.QueryRow(ctx, query, id).Scan(
 		&subcategory.SubCategoryID,
 		&subcategory.Name,
-		&subcategory.CreatedAt,
+		&subcategory.CategoryID,
 	)
 
 	if err != nil {
