@@ -9,6 +9,7 @@ type Common struct {
 type GetListReq struct {
 	Page   int32  `json:"page"`
 	Limit  int32  `json:"limit"`
+	Filter string `json:"filterwww"`
 	Search string `json:"search"`
 }
 

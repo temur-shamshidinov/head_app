@@ -23,6 +23,7 @@ func NewCategoryRepo(db *pgx.Conn, log log.Log) repoi.CategoryRepoI {
 //Category
 
 func (c *categoryRepo) CreateCategory(ctx context.Context, category *models.Category) (*models.Category, error) {
+	
 	c.log.Debug("request in CreateCategory.")
 
 	category.CategoryID = uuid.New()
@@ -102,6 +103,7 @@ func (c *categoryRepo) GetCategories(ctx context.Context, page, limit int32) (*m
 	}, nil
 }
 func (c *categoryRepo) GetCategory(ctx context.Context, id string) (*models.Category, error) {
+	
 	c.log.Debug("request in GetCategory.")
 
 	var category models.Category

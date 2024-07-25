@@ -12,7 +12,6 @@ type CategoryRepoI interface {
 	GetCategory(ctx context.Context, id string) (*models.Category, error)
 	UpdateCategory(ctx context.Context, category *models.Category) (*models.Category, error)
 	DeleteCategory(ctx context.Context, id string) error
-
 }
 type SubCategoryRepoI interface {
 	CreateSubCategory(ctx context.Context, subcategory *models.SubCategory) (*models.SubCategory, error)
@@ -21,20 +20,18 @@ type SubCategoryRepoI interface {
 	UpdateSubCategory(ctx context.Context, subcategory *models.SubCategory) (*models.SubCategory, error)
 	DeleteSubCategory(ctx context.Context, id string) error
 }
-type  ArticleRepoI interface {
-
+type ArticleRepoI interface {
 	CreateArticle(ctx context.Context, article *models.Article) (*models.Article, error)
 	GetArticles(ctx context.Context, page, limit int32) (*models.GetArticleListResp, error)
 	GetArticle(ctx context.Context, id string) (*models.Article, error)
 	UpdateArticle(ctx context.Context, article *models.Article) (*models.Article, error)
 	DeleteArticle(ctx context.Context, id string) error
 }
-  
+
 // owner
 
-type OwnerRepoI interface{
+type OwnerRepoI interface {
 	Login(ctx context.Context, login *models.LoginOwner) (*models.LoginOwner, error)
-
 }
 
 type CommonRepoI interface {
@@ -42,6 +39,13 @@ type CommonRepoI interface {
 }
 
 type ViewerRepoI interface {
-	CreateViewer(ctx context.Context,viewer *models.Viewer) (*models.Claim, error) 
-	LogIn(ctx context.Context,login *models.LogInViewer) (*models.Claim, error) 
+	CreateViewer(ctx context.Context, viewer *models.Viewer) (*models.Claim, error)
+	LogIn(ctx context.Context, login *models.LogInViewer) (*models.Claim, error)
+	//
+	// comment
+	AddComment(ctx context.Context, comment *models.Comment) (*models.Comment, error)
+	GetComments(ctx context.Context, getListReq *models.GetListReq) (*models.GetCommentListResp, error)
+	GetComment(ctx context.Context, id string) (*models.Comment, error)
+	UpdateComment(ctx context.Context, comment *models.Comment) (*models.Comment, error)
+	DeleteComment(ctx context.Context, id string) error
 }

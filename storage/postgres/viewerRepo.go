@@ -54,7 +54,7 @@ func (v *viewerRepo) CreateViewer(ctx context.Context, viewer *models.Viewer) (*
 func (v *viewerRepo) LogIn(ctx context.Context, login *models.LogInViewer) (*models.Claim, error) {
 
 	var (
-		viewerId        uuid.UUID
+		viewerId            uuid.UUID
 		gmail, passwordHash string
 	)
 	query := `
@@ -67,20 +67,20 @@ func (v *viewerRepo) LogIn(ctx context.Context, login *models.LogInViewer) (*mod
 		WHERE 
 			username = $1	
 	`
-	err := v.db.QueryRow(ctx, query, login.Username).Scan(&viewerId,&gmail,&passwordHash)
+	err := v.db.QueryRow(ctx, query, login.Username).Scan(&viewerId, &gmail, &passwordHash)
 	if err != nil {
 		return nil, err
 	}
 
-	if !helpers.CompareHashAndPassword(passwordHash,login.Password){
+	if !helpers.CompareHashAndPassword(passwordHash, login.Password) {
 		return nil, errors.New("password in incorrect")
 	}
 
 	return &models.Claim{
-		UserID: viewerId.String(),
+		UserID:   viewerId.String(),
 		UserRole: "viewer",
 	}, nil
-	
+
 }
 
 func (v *viewerRepo) GetClaims(ctx context.Context, id string) (*models.Claim, error) {
@@ -97,4 +97,80 @@ func (v *viewerRepo) GetClaims(ctx context.Context, id string) (*models.Claim, e
 		UserRole: "viewer",
 	}, nil
 
+}
+
+// comment
+
+func (v *viewerRepo) AddComment(ctx context.Context, comment *models.Comment) (*models.Comment, error) {
+
+	v.log.Debug("request in AddComment.")
+
+	comment.CommentID = uuid.New()
+
+	query := `
+		INSERT INTO 
+			comments (
+				comment_id,
+				content,   
+				article_id,
+				viewer_id 
+		) VALUES ($1, $2, $3, $4)
+	`
+	_, err := v.db.Exec(
+		ctx, query,
+		comment.CommentID,
+		comment.Content,
+		comment.ArticleID,
+		comment.ViewerID,
+	)
+
+	if err != nil {
+		v.log.Error("error on Add Commment", logger.Error(err))
+		return nil, err
+	}
+
+	comm, err := v.GetComment(ctx, comment.CommentID.String())
+	if err != nil {
+		v.log.Error("error on Getting new Comment", logger.Error(err))
+		return nil, err
+	}
+	return comm, nil
+}
+
+func (v *viewerRepo) GetComments(ctx context.Context, getListReq *models.GetListReq) (*models.GetCommentListResp, error) {
+	return nil, nil
+}
+
+func (v *viewerRepo) GetComment(ctx context.Context, id string) (*models.Comment, error) {
+	
+	v.log.Debug("request in GetComment.")
+
+	var comment models.Comment
+
+	query := `SELECT
+				*
+			  FROM 
+			  	comments 
+			  WHERE 
+			  	comment_id = $1 `
+
+	err := v.db.QueryRow(ctx, query, id).Scan(
+		&comment.CommentID,
+		&comment.Content,
+		&comment.CreatedAt,
+		&comment.ArticleID,
+		&comment.ViewerID,
+	)
+
+	if err != nil {
+		v.log.Error("error on Getting  Comment by id", logger.Error(err))
+		return nil, err
+	}
+	return &comment, nil
+}
+func (v *viewerRepo) UpdateComment(ctx context.Context, comment *models.Comment) (*models.Comment, error) {
+	return nil, nil
+}
+func (v *viewerRepo) DeleteComment(ctx context.Context, id string) error {
+	return nil
 }

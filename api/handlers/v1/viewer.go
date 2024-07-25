@@ -125,7 +125,7 @@ func (h *handlers) SignUp(ctx *gin.Context) {
 		return
 	}
 
-	var viewer  = &models.Viewer{}
+	var viewer = &models.Viewer{}
 
 	err = helpers.DataParser(regReqBody, &viewer)
 	if err != nil {
@@ -138,23 +138,22 @@ func (h *handlers) SignUp(ctx *gin.Context) {
 		return
 	}
 
-	claim, err := h.storage.GetViewerRepo().CreateViewer(ctx,viewer)
+	claim, err := h.storage.GetViewerRepo().CreateViewer(ctx, viewer)
 	if err != nil {
 		ctx.JSON(500, err)
 		return
 	}
 
-	accesstoken,err := token.GenerateJWT(*claim)
+	accesstoken, err := token.GenerateJWT(*claim)
 	if err != nil {
-		ctx.JSON(201,"registired")
+		ctx.JSON(201, "registired")
 		return
 	}
 
 	ctx.JSON(201, &models.RespAuth{AccessToken: accesstoken})
 }
 
-
-func (h *handlers) SignIn (ctx *gin.Context) {
+func (h *handlers) SignIn(ctx *gin.Context) {
 
 	var reqBody *models.LogInViewer
 
@@ -163,13 +162,13 @@ func (h *handlers) SignIn (ctx *gin.Context) {
 		return
 	}
 
-	claim, err := h.storage.GetViewerRepo().LogIn(ctx,reqBody)
+	claim, err := h.storage.GetViewerRepo().LogIn(ctx, reqBody)
 	if err != nil {
 		if err.Error() == "password in incorrect" {
-			ctx.JSON(405,err)
+			ctx.JSON(405, err)
 			return
 		}
-		ctx.JSON(500,err)
+		ctx.JSON(500, err)
 		return
 	}
 
@@ -178,7 +177,27 @@ func (h *handlers) SignIn (ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(201,&models.RespAuth{AccessToken: accesstoken})
+	ctx.JSON(201, &models.RespAuth{AccessToken: accesstoken})
 
 }
 
+func (h *handlers) AddComment(ctx *gin.Context) {
+
+	var reqBody models.CreateCommentReq
+
+	err := ctx.ShouldBindJSON(&reqBody)
+	if err != nil {
+		return
+	}
+
+	var comment = &models.Comment{}
+
+	helpers.DataParser(reqBody, &comment)
+
+	comment, err = h.storage.GetViewerRepo().AddComment(ctx,comment)
+	if err != nil {
+		return
+	}
+
+	ctx.JSON(201,comment)
+}
