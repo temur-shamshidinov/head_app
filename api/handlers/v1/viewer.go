@@ -185,6 +185,11 @@ func (h *handlers) AddComment(ctx *gin.Context) {
 
 	var reqBody models.CreateCommentReq
 
+	claim := Auth(ctx)
+	if claim == nil {
+		ctx.JSON(401,"unauth")
+	}
+
 	err := ctx.ShouldBindJSON(&reqBody)
 	if err != nil {
 		return
@@ -192,7 +197,10 @@ func (h *handlers) AddComment(ctx *gin.Context) {
 
 	var comment = &models.Comment{}
 
-	helpers.DataParser(reqBody, &comment)
+	helpers.DataParser(reqBody, &comment)	
+
+	comment.ViewerID, _ = uuid.Parse(claim.UserID)
+
 
 	comment, err = h.storage.GetViewerRepo().AddComment(ctx,comment)
 	if err != nil {

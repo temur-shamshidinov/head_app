@@ -17,7 +17,6 @@ type Comment struct {
 type CreateCommentReq struct {
 	Content   string    `json:"content"`
 	ArticleID uuid.UUID `json:"article_id"`
-	ViewerID  uuid.UUID `json:"viewer_id"`
 }
 
 type UpdateCommentReq struct {

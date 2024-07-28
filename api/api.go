@@ -2,6 +2,7 @@ package api
 
 import (
 	v1 "head_app/api/handlers/v1"
+	"head_app/api/middlewars"
 	log "head_app/pkg/logger"
 	"head_app/storage"
 	"head_app/storage/redis"
@@ -26,6 +27,7 @@ func Api(opt Options) *gin.Engine {
 	api.GET("/ping", h.Ping)
 
 	own := api.Group("/own")
+	own.Use(middlewars.OwnAuthMiddleware())
 	{
 		// SignUp
 
@@ -48,9 +50,10 @@ func Api(opt Options) *gin.Engine {
 	}
 
 	vw := api.Group("/vw")
+	vw.Use(middlewars.VwAuthMiddleware())
 	{
 		vw.POST("/log-out")
-		vw.POST("/comment/:article_id")
+		vw.POST("/comment", h.AddComment)
 	}
 
 	pb := api.Group("/pb")
@@ -66,6 +69,8 @@ func Api(opt Options) *gin.Engine {
 		pb.GET("/sub-categories/:id", h.GetSubCategory)   // completed
 		pb.GET("/articles", h.GetArticleList)             // completed
 		pb.GET("/articles/:id", h.GetArticle)             // completed
+		pb.GET("/comments/article_id", h.GetArticleList)  // completed
+
 	}
 
 	return engine
